@@ -16,7 +16,10 @@ app = Flask(__name__)
 # List to store created accounts
 created_accounts = []
 
-# Install Chrome and Chromedriver (automatically handled by chromedriver_autoinstaller)
+# Set the CHROME_BIN path to the location of Chrome in Render's environment
+os.environ["CHROME_BIN"] = "/usr/bin/google-chrome"
+
+# Install ChromeDriver using chromedriver_autoinstaller
 chromedriver_autoinstaller.install()  # This will automatically install the correct version of ChromeDriver
 chrome_path = chromedriver_autoinstaller.install()  # Path to ChromeDriver
 
@@ -30,7 +33,7 @@ options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
 # Now that Chrome is installed, set the binary location for Chrome
-options.binary_location = "/usr/bin/google-chrome"  # Render's default Chrome path
+options.binary_location = os.environ["CHROME_BIN"]  # Using the environment variable CHROME_BIN
 
 # Launch undetected Chrome driver
 driver = Chrome(service=Service(chrome_path), options=options)
