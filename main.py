@@ -7,7 +7,6 @@ from selenium.webdriver.common.keys import Keys
 from fake_useragent import UserAgent
 from flask import Flask, jsonify
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 import chromedriver_autoinstaller
 from undetected_chromedriver.v2 import Chrome, ChromeOptions
 
@@ -17,7 +16,7 @@ app = Flask(__name__)
 # List to store created accounts
 created_accounts = []
 
-# Install Chrome and Chromedriver
+# Install Chrome and Chromedriver (automatically handled by chromedriver_autoinstaller)
 chromedriver_autoinstaller.install()  # This will automatically install the correct version of ChromeDriver
 chrome_path = chromedriver_autoinstaller.install()  # Path to ChromeDriver
 
