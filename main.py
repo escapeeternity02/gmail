@@ -6,9 +6,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from fake_useragent import UserAgent
 from flask import Flask, jsonify
-from selenium.webdriver.chrome.service import Service
-import chromedriver_autoinstaller
 from undetected_chromedriver.v2 import Chrome, ChromeOptions
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 # Set up Flask app
 app = Flask(__name__)
@@ -18,10 +18,6 @@ created_accounts = []
 
 # Set the CHROME_BIN path to the location of Chrome in Render's environment
 os.environ["CHROME_BIN"] = "/usr/bin/google-chrome"  # Ensure this points to the correct Chrome path on Render
-
-# Install ChromeDriver using chromedriver_autoinstaller
-chromedriver_autoinstaller.install()  # This will automatically install the correct version of ChromeDriver
-chrome_path = chromedriver_autoinstaller.install()  # Path to ChromeDriver
 
 # Set up undetected-chromedriver
 options = ChromeOptions()
@@ -36,7 +32,7 @@ options.add_argument("--disable-dev-shm-usage")
 options.binary_location = os.environ["CHROME_BIN"]  # Using the environment variable CHROME_BIN
 
 # Launch undetected Chrome driver
-driver = Chrome(service=Service(chrome_path), options=options)
+driver = Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 # Function to create a Gmail account
 def create_gmail_account():
