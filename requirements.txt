@@ -1,0 +1,5 @@
+psycopg2
+selenium
+undetected-chromedriver
+fake_useragent
+webdriver-manager
