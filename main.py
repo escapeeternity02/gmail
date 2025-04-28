@@ -17,7 +17,7 @@ app = Flask(__name__)
 created_accounts = []
 
 # Set the CHROME_BIN path to the location of Chrome in Render's environment
-os.environ["CHROME_BIN"] = "/usr/bin/google-chrome"
+os.environ["CHROME_BIN"] = "/usr/bin/google-chrome"  # Ensure this points to the correct Chrome path on Render
 
 # Install ChromeDriver using chromedriver_autoinstaller
 chromedriver_autoinstaller.install()  # This will automatically install the correct version of ChromeDriver
