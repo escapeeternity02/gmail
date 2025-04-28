@@ -1,5 +1,6 @@
-Flask==2.1.2
+Flask==2.2.2
 undetected-chromedriver==3.0.0
 selenium==4.5.0
 fake_useragent==1.1.1
 webdriver-manager==4.0.2
+werkzeug==2.2.2
