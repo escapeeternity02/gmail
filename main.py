@@ -1,13 +1,12 @@
 import time
 import random
-import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from fake_useragent import UserAgent
 from flask import Flask, jsonify
+import chromedriver_autoinstaller
 from undetected_chromedriver.v2 import Chrome, ChromeOptions
-from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
 # Set up Flask app
@@ -16,45 +15,43 @@ app = Flask(__name__)
 # List to store created accounts
 created_accounts = []
 
-# Set the CHROME_BIN path to the location of Chrome in Render's environment
-os.environ["CHROME_BIN"] = "/usr/bin/google-chrome"  # Ensure this points to the correct Chrome path on Render
+# Install Chrome and Chromedriver
+chromedriver_autoinstaller.install()  # This will automatically install the correct version of ChromeDriver
 
-# Set up undetected-chromedriver
+# Path to ChromeDriver
+chrome_path = chromedriver_autoinstaller.install()  # Path to ChromeDriver
+
+# Set up undetected-chromedriver options
 options = ChromeOptions()
 user_agent = UserAgent().random
 options.add_argument(f"user-agent={user_agent}")
-options.add_argument("--headless")
+options.add_argument("--headless")  # If you want the browser to run without GUI (headless mode)
 options.add_argument("--disable-extensions")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 
-# Now that Chrome is installed, set the binary location for Chrome
-options.binary_location = os.environ["CHROME_BIN"]  # Using the environment variable CHROME_BIN
+# Set binary location for Chrome
+options.binary_location = "/usr/bin/google-chrome"  # Render's default Chrome path
 
 # Launch undetected Chrome driver
-driver = Chrome(service=Service(ChromeDriverManager().install()), options=options)
+driver = Chrome(options=options)
 
 # Function to create a Gmail account
 def create_gmail_account():
-    # Open Gmail signup page
     driver.get("https://accounts.google.com/signup")
     time.sleep(random.uniform(2, 5))
 
-    # Simulate human typing and actions
-    first_name = driver.find_element(By.ID, "firstName")
-    first_name.send_keys("John")
+    # Fill out the form
+    driver.find_element(By.ID, "firstName").send_keys("John")
     time.sleep(random.uniform(2, 5))
 
-    last_name = driver.find_element(By.ID, "lastName")
-    last_name.send_keys("Doe")
+    driver.find_element(By.ID, "lastName").send_keys("Doe")
     time.sleep(random.uniform(2, 5))
 
-    # Create a random username
     username = f"john.doe{random.randint(1000, 9999)}"
     driver.find_element(By.ID, "username").send_keys(username)
     time.sleep(random.uniform(2, 5))
 
-    # Password and confirmation
     password = "TestPassword1234"
     driver.find_element(By.NAME, "Passwd").send_keys(password)
     time.sleep(random.uniform(2, 5))
@@ -62,29 +59,23 @@ def create_gmail_account():
     driver.find_element(By.NAME, "ConfirmPasswd").send_keys(password)
     time.sleep(random.uniform(2, 5))
 
-    # Submit the form (after filling out email/password)
     driver.find_element(By.NAME, "ConfirmPasswd").send_keys(Keys.RETURN)
-
-    # Simulate human scrolling and interactions
-    scroll_y = random.randint(100, 500)
-    driver.execute_script(f"window.scrollTo(0, {scroll_y});")
     time.sleep(random.uniform(2, 5))
 
-    # Save account details to created_accounts list
+    # Store account info in created_accounts
     account_info = {"email": f"{username}@gmail.com", "password": password}
     created_accounts.append(account_info)
 
-    # Write to a text file (store accounts)
+    # Write account to a text file
     with open("accounts.txt", "a") as file:
         file.write(f"{account_info['email']} | {account_info['password']}\n")
 
-    # Output for debugging
     print(f"Created account: {username}@gmail.com with password: {password}")
 
-# Create a new Gmail account (can be repeated for multiple accounts)
+# Create a Gmail account (repeatable if needed)
 create_gmail_account()
 
-# Flask route to display accounts as JSON
+# Flask route to display accounts in JSON format
 @app.route('/accounts', methods=['GET'])
 def show_accounts():
     return jsonify(created_accounts)
@@ -93,9 +84,9 @@ def show_accounts():
 def home():
     return "Welcome to the Gmail Automation Service!"
 
-# Run the Flask web server
+# Run Flask server
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=8000)
 
-# Finish and close the browser after running the automation
+# After automation ends, close the driver (important for cleanup)
 driver.quit()
