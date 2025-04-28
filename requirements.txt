@@ -3,3 +3,4 @@ undetected-chromedriver
 fake_useragent
 Flask
 webdriver-manager
+chromedriver-autoinstaller
